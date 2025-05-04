@@ -23,20 +23,22 @@ class Transformer(nn.Module):
 
     def forward(self, input):
         embedding = self.embed(input)
-        print(f"Embedding {embedding.shape}")
+        # # print(f"Embedding {embedding.shape}")
         for attn_layer, attn_layer_norm, feed_fwd_layer, feed_fwd_activation, feed_fwd_layer_norm in zip(self.attn_layers, self.attn_layer_norms, self.feed_fwd_layers, self.feed_fwd_activations, self.feed_fwd_layer_norms):
             attn_output = attn_layer(embedding)
-            print(f"Attention output {attn_output.shape}")
+            # print(f"Attention output {attn_output.shape}")
             residual_added = embedding+attn_output
-            print(f"Residual added to attention output: {residual_added.shape}")
+            # print(f"Residual added to attention output: {residual_added.shape}")
             normed_embedding = attn_layer_norm(residual_added)
-            print(f"Layer normalized embedding {normed_embedding.shape}")
+            # print(f"Layer normalized embedding {normed_embedding.shape}")
             feed_fwd_output = feed_fwd_activation(feed_fwd_layer(normed_embedding))
-            print(f"Feed forward output {feed_fwd_output.shape}")
+            # print(f"Feed forward output {feed_fwd_output.shape}")
             residual_added_feed_fwd_output = normed_embedding+feed_fwd_output
-            print(f"Residual added to feed forward {residual_added_feed_fwd_output.shape}")
+            # print(f"Residual added to feed forward {residual_added_feed_fwd_output.shape}")
             embedding = feed_fwd_layer_norm(residual_added_feed_fwd_output)
-            print(f"Final embedding {embedding.shape}")
-        logits = self.final_mlp(embedding[:,0,:,:])
-        print(f"Logits {logits.shape}")
+            # print(f"Final embedding {embedding.shape}")
+        print(embedding.shape)
+        #computing logits on the first class token
+        logits = self.final_mlp(embedding[:,0,:])
+        # print(f"Logits {logits.shape}")
         return logits

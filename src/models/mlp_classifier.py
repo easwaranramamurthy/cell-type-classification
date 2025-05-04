@@ -9,4 +9,4 @@ class MLP(nn.Module):
 
 
     def forward(self, input):
-        return self.feed_fwd_2(self.sigmoid(self.feed_fwd(input)))        
+        return self.feed_fwd_2(self.sigmoid(self.feed_fwd(input)))
