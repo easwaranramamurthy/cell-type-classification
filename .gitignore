@@ -1,7 +1,5 @@
 wandb/*
 data/*
-models/*
 
 wandb/
 data/
-models/
