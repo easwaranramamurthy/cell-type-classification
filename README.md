@@ -1,4 +1,4 @@
-# somite-take-home
+# cell-type-classification
 Cell type classification take home from somite
 
 # Description of code:
