@@ -1,5 +1,5 @@
 # cell-type-classification
-Cell type classification take home from somite
+Cell type classification
 
 # Description of code:
 

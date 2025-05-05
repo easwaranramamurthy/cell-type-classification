@@ -1,12 +1,31 @@
 import torch.nn as nn
+import torch
+
 
 class MLP(nn.Module):
-    def __init__(self, num_classes, d_model=512,hidden_dim=32):
+    def __init__(
+        self, num_classes: int, d_model: int = 512, hidden_dim: int = 32
+    ) -> None:
+        """Initializes a multi-layer perceptron classifier with a single hidden layer with sigmoid activations
+
+        Args:
+            num_classes (int): number of output logits
+            d_model (int, optional): number of input features. Defaults to 512.
+            hidden_dim (int, optional): number of hidden layer units. Defaults to 32.
+        """
+
         super(MLP, self).__init__()
         self.feed_fwd = nn.Linear(in_features=d_model, out_features=hidden_dim)
         self.sigmoid = nn.Sigmoid()
         self.feed_fwd_2 = nn.Linear(in_features=hidden_dim, out_features=num_classes)
 
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
+        """Forward pass through the MLP
 
-    def forward(self, input):
+        Args:
+            input (torch.Tensor): input features
+
+        Returns:
+            torch.Tensor: output logits of the MLP
+        """
         return self.feed_fwd_2(self.sigmoid(self.feed_fwd(input)))
