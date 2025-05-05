@@ -15,9 +15,11 @@ class Transformer(nn.Module):
         super(Transformer, self).__init__()
         self.embed = nn.Embedding(num_embeddings=vocab_size, embedding_dim=d_model)
         self.attn_layers = [SelfAttention(num_tokens, d_model, d_q_k_v, num_heads) for _ in range(num_layers)]
+        #TODO: make sure this is applying layer norm over the correct dimension
         self.attn_layer_norms = [nn.LayerNorm(d_model) for _ in range(num_layers)]
         self.feed_fwd_layers = [nn.Linear(in_features=d_model,out_features=d_model) for _ in range(num_layers)]
         self.feed_fwd_activations = [nn.Sigmoid() for _ in range(num_layers)]
+        #TODO: make sure this is applying layer norm over the correct dimension
         self.feed_fwd_layer_norms = [nn.LayerNorm(d_model) for _ in range(num_layers)]
         self.final_mlp = MLP(num_classes=num_classes)
 
@@ -38,7 +40,7 @@ class Transformer(nn.Module):
             embedding = feed_fwd_layer_norm(residual_added_feed_fwd_output)
             # print(f"Final embedding {embedding.shape}")
         print(embedding.shape)
-        #computing logits on the first class token
+        #computing logits on the first token - CLS
         logits = self.final_mlp(embedding[:,0,:])
         # print(f"Logits {logits.shape}")
         return logits

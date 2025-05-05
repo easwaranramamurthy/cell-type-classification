@@ -20,19 +20,15 @@ class SelfAttention(nn.Module):
         batch_size = embedding.shape[0]
         queries = torch.reshape(self.query(embedding),(batch_size,self.num_tokens,self.num_heads,self.d_q_k_v))
         keys = torch.reshape(self.key(embedding),(batch_size,self.num_tokens,self.num_heads,self.d_q_k_v))
-        values = self.value(embedding)
-        values = torch.reshape(values,(batch_size,self.num_tokens,self.num_heads,self.d_q_k_v))
-
-        # print(f"Queries {queries.shape}")
-        # print(f"Keys {keys.shape}")
-        # print(f"Keys transposed: {torch.transpose(keys,2,3).shape}")
-        # q_k_multiplied = torch.matmul(queries, torch.transpose(keys,2,3))
-        # print(f"QK multipled shape {q_k_multiplied.shape}")
+        values = torch.reshape(self.value(embedding),(batch_size,self.num_tokens,self.num_heads,self.d_q_k_v))
 
         token_weights_pre_softmax = torch.einsum('bthd, buhd->btuh', queries, keys)
         token_weights_pre_softmax_scaled = torch.div(token_weights_pre_softmax, torch.sqrt(torch.tensor(self.d_model)))
         softmaxed_weights = self.softmax(token_weights_pre_softmax_scaled)
+
         value_weights = torch.einsum('btth,bthd->bthd', softmaxed_weights, values)
+
         value_weights_concat = torch.reshape(value_weights, (batch_size, self.num_tokens, self.num_heads*self.d_q_k_v))
         attention_output = self.output(value_weights_concat)
+        
         return attention_output
