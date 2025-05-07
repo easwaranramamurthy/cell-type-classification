@@ -7,7 +7,7 @@ import torch
 class Transformer(nn.Module):
     def __init__(
         self,
-        num_layers: int = 6,
+        num_layers: int = 4,
         vocab_size: int = 20000,
         num_tokens: int = 2048,
         d_model: int = 512,
