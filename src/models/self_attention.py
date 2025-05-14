@@ -53,12 +53,14 @@ class SelfAttention(nn.Module):
             (batch_size, self.num_tokens, self.num_heads, self.d_q_k_v),
         )
 
+        print(queries.shape, keys.shape)
         token_weights_pre_softmax = torch.einsum("bthd, buhd->btuh", queries, keys)
         token_weights_pre_softmax_scaled = torch.div(
             token_weights_pre_softmax, torch.sqrt(torch.tensor(self.d_model))
         )
         softmaxed_weights = self.softmax(token_weights_pre_softmax_scaled)
 
+        print(softmaxed_weights.shape, values.shape)
         value_weights = torch.einsum("btth,bthd->bthd", softmaxed_weights, values)
 
         value_weights_concat = torch.reshape(

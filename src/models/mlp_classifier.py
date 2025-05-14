@@ -4,14 +4,14 @@ import torch
 
 class MLP(nn.Module):
     def __init__(
-        self, num_classes: int, d_model: int = 512, hidden_dim: int = 32
+        self, num_classes: int, d_model: int = 512, hidden_dim: int = 16
     ) -> None:
         """Initializes a multi-layer perceptron classifier with a single hidden layer with sigmoid activations
 
         Args:
             num_classes (int): number of output logits
             d_model (int, optional): number of input features. Defaults to 512.
-            hidden_dim (int, optional): number of hidden layer units. Defaults to 32.
+            hidden_dim (int, optional): number of hidden layer units. Defaults to 16.
         """
 
         super(MLP, self).__init__()
