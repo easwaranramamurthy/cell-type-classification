@@ -9,7 +9,6 @@ class Transformer(nn.Module):
         self,
         num_layers: int = 4,
         vocab_size: int = 20000,
-        num_tokens: int = 2048,
         d_model: int = 512,
         d_q_k_v: int = 128,
         num_heads: int = 6,
@@ -39,11 +38,11 @@ class Transformer(nn.Module):
         self.second_layernorms = nn.ModuleList()
 
         for i in range(num_layers):
-            self.attn_ops.add_module(f'attn_{i}', SelfAttention(num_tokens, d_model, d_q_k_v, num_heads).to(device='mps'))
-            self.first_layernorms.add_module(f'ln1_{i}', nn.LayerNorm(d_model).to(device='mps'))
-            self.feed_fwd_layers.add_module(f'fwd_{i}', nn.Linear(in_features=d_model, out_features=d_model).to(device='mps'))
-            self.feed_fwd_activations.add_module(f'fwd_activation_{i}', nn.Sigmoid().to(device='mps'))
-            self.second_layernorms.add_module(f'ln2_{i}', nn.LayerNorm(d_model).to(device='mps'))
+            self.attn_ops.add_module(f'attn_{i}', SelfAttention(d_model, d_q_k_v, num_heads))
+            self.first_layernorms.add_module(f'ln1_{i}', nn.LayerNorm(d_model))
+            self.feed_fwd_layers.add_module(f'fwd_{i}', nn.Linear(in_features=d_model, out_features=d_model))
+            self.feed_fwd_activations.add_module(f'fwd_activation_{i}', nn.GELU())
+            self.second_layernorms.add_module(f'ln2_{i}', nn.LayerNorm(d_model))
        
         self.final_mlp = MLP(num_classes=num_classes, d_model=d_model, hidden_dim=hidden_dim)
 

@@ -1,8 +1,10 @@
 wandb/*
 data/*
+checkpoints/*
 
 wandb/
 data/
+checkpoints/
 
 *.pyc
 src/*/__pycache__/*

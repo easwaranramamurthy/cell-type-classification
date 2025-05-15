@@ -16,7 +16,7 @@ class MLP(nn.Module):
 
         super(MLP, self).__init__()
         self.feed_fwd = nn.Linear(in_features=d_model, out_features=hidden_dim)
-        self.sigmoid = nn.Sigmoid()
+        self.sigmoid = nn.GELU()
         self.feed_fwd_2 = nn.Linear(in_features=hidden_dim, out_features=num_classes)
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
