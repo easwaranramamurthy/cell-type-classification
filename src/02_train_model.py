@@ -75,7 +75,7 @@ def train_model(net: nn.Module, train_dataset: NpyDataset, val_dataset: NpyDatas
     """
     timestamp = time.time()    
     train_dataloader = torch.utils.data.DataLoader(train_dataset,batch_size=batch_size_train,shuffle=True, num_workers=num_workers)
-    optim = torch.optim.AdamW(params = net.parameters())
+    optim = torch.optim.AdamW(params = net.parameters(), lr=0.01)
     min_val_loss = float('inf')
 
     num_epochs_unsuccessful = 0
@@ -117,8 +117,8 @@ def train_model(net: nn.Module, train_dataset: NpyDataset, val_dataset: NpyDatas
 
 
 if __name__=="__main__":
-    batch_size_train=8
-    batch_size_infer=64
+    batch_size_train=1
+    batch_size_infer=1
     epochs=100
     patience=5
     num_workers = 6
@@ -131,13 +131,15 @@ if __name__=="__main__":
     num_classes = cat_label_mapping.shape[0]
 
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-    net = Transformer(num_layers=4,
+    net = Transformer(num_layers=6,
                     vocab_size=vocab_size,
                     d_model=256,
-                    d_q_k_v=16,
+                    d_q_k_v=64,
                     num_heads=6,
                     num_classes=num_classes,
-                    hidden_dim=16)
+                    hidden_dim=16,
+                    dropout=0.1
+                    )
 
     net.to(device=device)
     train_model(net, train_dataset, val_dataset, epochs, batch_size_train, batch_size_infer,patience,num_workers)
