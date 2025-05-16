@@ -6,7 +6,7 @@ Cell type classification
 
 1. `01_preprocess_sc_data.ipynb` - preprocessing of single cell data using scanpy, ranking genes, selecting top k for rank value encoding to transformer model.
 * For the base version, it selects the top 2048 genes and it appends a `<CLS>` token to the beginning.
-* For the version with the previous time point, it selects the top 1024 gene indexes for the current time point and the top 12024 genes at the previous time point. It then concatenates these two index lists with a <SEP> token in the middle. It again appends a `<CLS>` token at the beginning of the token list.
+* For the version with the previous time point, it selects the top 1024 gene indexes for the current time point and the top 12024 genes at the previous time point. It then concatenates these two index lists with a `<SEP>` token in the middle. It again appends a `<CLS>` token at the beginning of the token list.
 * Finally, the preprocessing includes additional splitting of the test set into two sets (val and test) for robust evaluation/hyperparameter tuning etc.
 
 2. `models/self_attention.py` - implements a single dot product self attention layer with no positional encoding
@@ -22,7 +22,7 @@ Cell type classification
 
 7. WandB runs are available on a public link here - https://wandb.ai/easwaran/cell_type_classification
 
-8. TODO: `03_compile_evaluation_metrics.py` - notebook for compilation of evaluation metrics and comparing all trained models. 
+8. TODO: `03_compile_evaluation_metrics.ipynb` - notebook for compilation of evaluation metrics and comparing all trained models. 
 
 
 # Comparing Geneformer and scGPT:

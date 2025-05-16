@@ -23,7 +23,6 @@ def accuracy(preds:torch.Tensor, labels: torch.Tensor) -> tuple[float, float]:
     pred_classes = preds.argmax(dim=1)
     correct = (pred_classes == labels).sum().item()
     total = labels.size(0)
-    print(correct, total)
     return correct, total
 
 def compute_metrics(net: nn.Module, dataset: NpyDataset, loss_fn: nn.Module, batch_size:int=64, num_workers:int=6) -> tuple[float, float]:
