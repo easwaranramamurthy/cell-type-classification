@@ -39,7 +39,7 @@ Geneformer needs additional fine-tuning on top of the model embeddings for cell 
 * scGPT uses a decoder module as well and is trained in an autoregressive manner to predict new genes that are unknown from genes that are known or already predicted + additional tokens like <cls>. A random number of genes are chosen as unknown although it is unclear from the paper whether the random sample is generated per cell or across the corpus.
 
 ### Pros and Cons:
-The causal masking in scGPT and unidirectional nature of generation is not ideal for single cell data where there is no ideal ordering of genes. Such sort of generation would be useful if genes are generated in a ranked manner but the order of input to scGPT is randomized and hence, it doesn't completely make sense.
+The causal masking in scGPT and unidirectional nature of generation is not ideal for single cell data where there is no ideal ordering of genes. Such sort of generation would be useful if genes are generated in a ranked manner but the order of input to scGPT is randomized and hence, it doesn't seem necessary.
 
 ## 3. Corpus:
 * Geneformer is trained on 30M single cells from a broad range of human tissues so it can learn gene network dynamics across a large number of tissues/cell types.
