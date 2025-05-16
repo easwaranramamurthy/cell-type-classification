@@ -22,6 +22,9 @@ Cell type classification
 
 7. WandB runs are available on a public link here - https://wandb.ai/easwaran/cell_type_classification
 
+8. TODO: `03_compile_evaluation_metrics.py` - notebook for compilation of evaluation metrics and comparing all trained models. 
+
+
 # Comparing Geneformer and scGPT:
 
 The main differences between Geneformer and scGPT are:
