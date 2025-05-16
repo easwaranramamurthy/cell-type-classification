@@ -75,7 +75,7 @@ def train_model(net: nn.Module, train_dataset: NpyDataset, val_dataset: NpyDatas
     """
     timestamp = time.time()    
     train_dataloader = torch.utils.data.DataLoader(train_dataset,batch_size=batch_size_train,shuffle=True, num_workers=num_workers)
-    optim = torch.optim.AdamW(params = net.parameters(), lr=0.01)
+    optim = torch.optim.AdamW(params = net.parameters())
     min_val_loss = float('inf')
 
     num_epochs_unsuccessful = 0
@@ -111,7 +111,7 @@ def train_model(net: nn.Module, train_dataset: NpyDataset, val_dataset: NpyDatas
                         'optimizer_state_dict': optim.state_dict(),
                         'train_loss': train_loss,
                         'val_loss': val_loss},
-                        f'../checkpoints/model_w_previous_{timestamp}.pth')
+                        f'../checkpoints/model_median_norm_{timestamp}.pth')
         else:
             num_epochs_unsuccessful+=1
         
@@ -119,7 +119,7 @@ def train_model(net: nn.Module, train_dataset: NpyDataset, val_dataset: NpyDatas
             print(f'Early stopping since no improvement in validation loss for {patience} epochs')
             break
 
-    torch.save(net, f'../checkpoints/final_model_w_previous_{timestamp}.pth')
+    torch.save(net, f'../checkpoints/final_model_median_norm_{timestamp}.pth')
 
 
 if __name__=="__main__":
@@ -129,22 +129,22 @@ if __name__=="__main__":
     patience=5
     num_workers = 6
 
-    train_dataset = NpyDataset('../data/Xtrain_w_previous.npy', '../data/Ytrain_w_previous.npy')
-    val_dataset = NpyDataset('../data/Xval_w_previous.npy', '../data/Yval_w_previous.npy')
-    vocab = pd.read_csv('../data/new_vocab.csv', header=None, index_col=0)
+    train_dataset = NpyDataset('../data/Xtrain_base_median_norm.npy', '../data/Ytrain_base_median_norm.npy')
+    val_dataset = NpyDataset('../data/Xval_base_median_norm.npy', '../data/Yval_base_median_norm.npy')
+    vocab = pd.read_csv('../data/vocab.csv', header=None, index_col=0)
     vocab_size = vocab.shape[0]
     cat_label_mapping = pd.read_csv('../data/cat_label_mapping.csv', header=None)
     num_classes = cat_label_mapping.shape[0]
 
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-    net = Transformer(num_layers=6,
+    net = Transformer(num_layers=3,
                     vocab_size=vocab_size,
-                    d_model=256,
-                    d_q_k_v=64,
-                    num_heads=6,
+                    d_model=128,
+                    d_q_k_v=32,
+                    num_heads=3,
                     num_classes=num_classes,
-                    hidden_dim=16,
-                    dropout=0.1
+                    hidden_dim=64,
+                    dropout=0.05
                     )
 
     net.to(device=device)
