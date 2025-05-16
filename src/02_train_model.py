@@ -111,7 +111,7 @@ def train_model(net: nn.Module, train_dataset: NpyDataset, val_dataset: NpyDatas
                         'optimizer_state_dict': optim.state_dict(),
                         'train_loss': train_loss,
                         'val_loss': val_loss},
-                        f'../checkpoints/model_{timestamp}.pth')
+                        f'../checkpoints/model_w_previous_{timestamp}.pth')
         else:
             num_epochs_unsuccessful+=1
         
@@ -119,7 +119,7 @@ def train_model(net: nn.Module, train_dataset: NpyDataset, val_dataset: NpyDatas
             print(f'Early stopping since no improvement in validation loss for {patience} epochs')
             break
 
-    torch.save(net, f'../checkpoints/final_model_{timestamp}.pth')
+    torch.save(net, f'../checkpoints/final_model_w_previous_{timestamp}.pth')
 
 
 if __name__=="__main__":
@@ -129,9 +129,9 @@ if __name__=="__main__":
     patience=5
     num_workers = 6
 
-    train_dataset = NpyDataset('../data/Xtrain_base.npy', '../data/Ytrain_base.npy')
-    val_dataset = NpyDataset('../data/Xval_base.npy', '../data/Yval_base.npy')
-    vocab = pd.read_csv('../data/vocab.csv', header=None, index_col=0)
+    train_dataset = NpyDataset('../data/Xtrain_w_previous.npy', '../data/Ytrain_w_previous.npy')
+    val_dataset = NpyDataset('../data/Xval_w_previous.npy', '../data/Yval_w_previous.npy')
+    vocab = pd.read_csv('../data/new_vocab.csv', header=None, index_col=0)
     vocab_size = vocab.shape[0]
     cat_label_mapping = pd.read_csv('../data/cat_label_mapping.csv', header=None)
     num_classes = cat_label_mapping.shape[0]
