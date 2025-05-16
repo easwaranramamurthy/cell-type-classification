@@ -79,7 +79,13 @@ def train_model(net: nn.Module, train_dataset: NpyDataset, val_dataset: NpyDatas
     min_val_loss = float('inf')
 
     num_epochs_unsuccessful = 0
-    loss_fn = nn.CrossEntropyLoss()
+
+    # upweighting lowly represented classes
+    _, counts = np.unique(train_dataset.y, return_counts=True)
+    proportions = counts/ counts.sum()
+    weights = torch.FloatTensor(1.0 / proportions).to(device='mps')
+
+    loss_fn = nn.CrossEntropyLoss(weight=weights)
     wandb.init(project="cell_type_classification",config={})
     print("Training model")
     for e in tqdm(range(epochs), position=0, desc='train_epochs'):
