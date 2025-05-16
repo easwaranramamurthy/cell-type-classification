@@ -10,7 +10,7 @@ import time
 from models.transformer import Transformer
 from datasets.npy_dataset import NpyDataset
 
-def accuracy(preds:torch.Tensor, labels: torch.Tensor) -> tuple[int, int]:
+def accuracy(preds:torch.Tensor, labels: torch.Tensor) -> tuple[float, float]:
     """computes accuracy for multi class classification
 
     Args:
@@ -18,14 +18,15 @@ def accuracy(preds:torch.Tensor, labels: torch.Tensor) -> tuple[int, int]:
         labels (torch.Tensor): labels
 
     Returns:
-        tuple[int, int]: number of correct preds, number of samples
+        tuple[float, float]: number of correct preds, number of samples
     """
     pred_classes = preds.argmax(dim=1)
     correct = (pred_classes == labels).sum().item()
-    total = labels.shape[0]
+    total = labels.size(0)
+    print(correct, total)
     return correct, total
 
-def compute_metrics(net: nn.Module, dataset: NpyDataset, loss_fn: nn.Module, batch_size:int=64, num_workers:int=6) -> tuple[int, int]:
+def compute_metrics(net: nn.Module, dataset: NpyDataset, loss_fn: nn.Module, batch_size:int=64, num_workers:int=6) -> tuple[float, float]:
     """Do inference and compute loss and accuracy on a dataset
 
     Args:
@@ -36,16 +37,16 @@ def compute_metrics(net: nn.Module, dataset: NpyDataset, loss_fn: nn.Module, bat
     Returns:
         tuple[int, int]: loss and accuracy
     """
-    dataloader = torch.utils.data.DataLoader(dataset,batch_size=batch_size,shuffle=True, num_workers=num_workers)
+    dataloader = torch.utils.data.DataLoader(dataset,batch_size=batch_size,shuffle=False, num_workers=num_workers)
     net.eval()
     loss = 0.0
     num_batches = 0
     num_correct = 0
     num_total = 0
     with torch.no_grad():
-        for batch_x,batch_y in tqdm(dataloader, total=len(dataloader), position=3, leave=False, desc='inference'):
+        for batch_x,batch_y in tqdm(dataloader, total=len(dataloader), position=1, leave=False, desc='inference'):
             batch_x = batch_x.to(device=device).to(torch.long)
-            batch_y = batch_y.to(device=device)
+            batch_y = batch_y.to(device=device).long()
             pred = net(batch_x)
             loss_value = loss_fn(pred,batch_y).item()
 
@@ -60,7 +61,7 @@ def compute_metrics(net: nn.Module, dataset: NpyDataset, loss_fn: nn.Module, bat
     
     return loss, acc
 
-def train_model(net: nn.Module, train_dataset: NpyDataset, val_dataset: NpyDataset, epochs: int, batch_size_train: int=8, batch_size_infer: int=64, patience: int=5, num_workers: int=6) -> nn.Module:
+def train_model(net: nn.Module, train_dataset: NpyDataset, val_dataset: NpyDataset, epochs: int, batch_size_train: int=8, batch_size_infer: int=64, patience: int=5, num_workers: int=6, device: torch.device=torch.device('mps')) -> nn.Module:
     """Train the model to do multi class classification on an Npy dataset
     Args:
         net (nn.Module): model
@@ -81,18 +82,20 @@ def train_model(net: nn.Module, train_dataset: NpyDataset, val_dataset: NpyDatas
     num_epochs_unsuccessful = 0
 
     # upweighting lowly represented classes
-    _, counts = np.unique(train_dataset.y, return_counts=True)
-    proportions = counts/ counts.sum()
-    weights = torch.FloatTensor(1.0 / proportions).to(device='mps')
+    # _, counts = np.unique(train_dataset.y, return_counts=True)
+    # proportions = counts/ counts.sum()
+    # weights = torch.FloatTensor(1.0 / proportions).to(device='mps')
+    # loss_fn = nn.CrossEntropyLoss(weight=weights)
 
-    loss_fn = nn.CrossEntropyLoss(weight=weights)
+    loss_fn = nn.CrossEntropyLoss()
+
     wandb.init(project="cell_type_classification",config={})
     print("Training model")
     for e in tqdm(range(epochs), position=0, desc='train_epochs'):
         net.train()
-        for i, (batch_x, batch_y) in tqdm(enumerate(train_dataloader), total=len(train_dataloader), position=1, leave=False, desc='train_pass'):
+        for i, (batch_x, batch_y) in tqdm(enumerate(train_dataloader), total=len(train_dataloader), position=0, leave=False, desc='train_pass'):
             batch_x = batch_x.to(device=device).to(torch.long)
-            batch_y = batch_y.to(device=device)
+            batch_y = batch_y.to(device=device).long()
             optim.zero_grad()
             pred = net(batch_x)
             loss = loss_fn(pred,batch_y)
@@ -123,8 +126,8 @@ def train_model(net: nn.Module, train_dataset: NpyDataset, val_dataset: NpyDatas
 
 
 if __name__=="__main__":
-    batch_size_train=1
-    batch_size_infer=1
+    batch_size_train=8
+    batch_size_infer=8
     epochs=100
     patience=5
     num_workers = 6
@@ -137,17 +140,17 @@ if __name__=="__main__":
     num_classes = cat_label_mapping.shape[0]
 
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-    net = Transformer(num_layers=3,
+    net = Transformer(num_layers=4,
                     vocab_size=vocab_size,
-                    d_model=128,
-                    d_q_k_v=32,
-                    num_heads=3,
+                    d_model=256,
+                    d_q_k_v=16,
+                    num_heads=6,
                     num_classes=num_classes,
-                    hidden_dim=64,
+                    hidden_dim=16,
                     dropout=0.05
                     )
 
     net.to(device=device)
-    train_model(net, train_dataset, val_dataset, epochs, batch_size_train, batch_size_infer,patience,num_workers)
+    train_model(net, train_dataset, val_dataset, epochs=epochs, batch_size_train=batch_size_train, batch_size_infer=batch_size_infer,patience=patience,num_workers=num_workers,device=device)
 
 
